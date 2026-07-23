@@ -1,4 +1,4 @@
-# Bennies Laurence C. Macaspac,
+# Bennies Laurence C. Macaspac
 ## INF233
 ## CTADMOBL Advance Mobile Programming 
 
