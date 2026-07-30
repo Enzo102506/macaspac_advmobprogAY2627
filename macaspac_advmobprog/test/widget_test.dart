@@ -1,30 +1,65 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
-import 'package:macaspac_advmobprog/main.dart';
-
+// App entry point for the widget test app: provides ThemeModel and runs MyApp.
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeModel(),
+      child: const MyApp(),
+    ),
+  );
+}
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  // Build the top-level MaterialApp using the current theme from ThemeModel.
+  @override
+  Widget build(BuildContext context) {
+    final themeModel = Provider.of<ThemeModel>(context);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+    return MaterialApp(
+      theme: themeModel.isDark ? ThemeData.dark() : ThemeData.light(),
+      home: const MyHome(),
+    );
+  }
+}
+
+class ThemeModel with ChangeNotifier {
+  bool _isDark = false;
+
+  // Return whether dark theme is enabled.
+  bool get isDark => _isDark;
+
+  // Toggle the theme and notify listeners to rebuild UI.
+  void toggleTheme() {
+    _isDark = !_isDark;
+    notifyListeners();
+  }
+}
+
+class MyHome extends StatelessWidget {
+  const MyHome({super.key});
+
+  // Build the home screen with an app bar switch to toggle theme.
+  @override
+  Widget build(BuildContext context) {
+    final themeModel = Provider.of<ThemeModel>(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('App State Example'),
+        actions: [
+          Switch(
+            value: themeModel.isDark,
+            onChanged: (_) => themeModel.toggleTheme(),
+          ),
+        ],
+      ),
+      body: const Center(
+        child: Text('Toggle the theme using the switch in the app bar'),
+      ),
+    );
+  }
 }
