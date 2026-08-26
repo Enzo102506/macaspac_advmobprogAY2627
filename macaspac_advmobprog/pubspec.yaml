@@ -19,6 +19,7 @@ dependencies:
   http: ^0.13.6
   flutter_screenutil: ^5.8.3
   flutter_dotenv: ^5.0.2
+  shared_preferences: ^2.3.5
 
 dev_dependencies:
   flutter_test:

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../constants.dart';
+import '../models/user.dart';
+import '../services/user_service.dart';
 import 'cart_screen.dart';
 import 'product_screen.dart';
-import 'settings_screen.dart';
+import 'profile_screen.dart';
 import '../widgets/custom_text.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,9 +21,27 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
   Key _cartScreenKey = const ValueKey<int>(0);
+  User? _loggedInUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final user = await UserService().getSavedUser();
+    if (mounted) {
+      setState(() {
+        _loggedInUser = user;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final activeUserId = _loggedInUser?.id ?? cartUserId;
+
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -53,9 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
             const ProductScreen(),
             CartScreen(
               key: _cartScreenKey,
-              userId: cartUserId,
+              userId: activeUserId,
             ),
-            const SettingsScreen(),
+            const ProfileScreen(),
           ],
           onPageChanged: (page) {
             setState(() {
