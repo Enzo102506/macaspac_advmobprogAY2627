@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../constants.dart';
+import 'cart_screen.dart';
 import 'product_screen.dart';
+import 'settings_screen.dart';
 import '../widgets/custom_text.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,11 +18,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
+  Key _cartScreenKey = const ValueKey<int>(0);
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -27,12 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ? Image.asset('assets/icons/nubdexchange_logo.png', scale: 11.sp)
               : CustomText(
                   text: (_selectedIndex == 1)
-                      ? 'Chat'
+                      ? 'Cart'
                       : (_selectedIndex == 2)
                       ? 'Profile'
                       : 'Home',
                   fontSize: 20.sp,
-                  // color: FB_LIGHT_PRIMARY,
                   fontWeight: FontWeight.w600,
                 ),
           actions: [
@@ -45,7 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
         body: PageView(
           physics: const NeverScrollableScrollPhysics(),
           controller: _pageController,
-          children: const <Widget>[ProductScreen()],
+          children: <Widget>[
+            const ProductScreen(),
+            CartScreen(
+              key: _cartScreenKey,
+              userId: cartUserId,
+            ),
+            const SettingsScreen(),
+          ],
           onPageChanged: (page) {
             setState(() {
               _selectedIndex = page;
@@ -53,12 +64,15 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
         bottomNavigationBar: BottomNavigationBar(
-          showSelectedLabels: false, //selected item
-          showUnselectedLabels: false, //unselected item
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
           onTap: _onTappedBar,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.shop_2), label: 'Shop'),
-            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart_outlined),
+              label: 'Cart',
+            ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
           currentIndex: _selectedIndex,
@@ -68,6 +82,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onTappedBar(int value) {
+    if (value == 1) {
+      _cartScreenKey = ValueKey<int>(DateTime.now().millisecondsSinceEpoch);
+    }
+
     setState(() {
       _selectedIndex = value;
     });

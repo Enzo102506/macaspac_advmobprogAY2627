@@ -5,7 +5,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import 'constants.dart';
+
 // screens
+import 'screens/cart_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 
@@ -50,6 +53,7 @@ class MacaspacAdvMobProg extends StatelessWidget {
             routes: {
               '/home': (context) => const HomeScreen(),
               '/settings': (context) => const SettingsScreen(),
+              '/cart': (context) => CartScreen(userId: cartUserId),
             },
           );
         },

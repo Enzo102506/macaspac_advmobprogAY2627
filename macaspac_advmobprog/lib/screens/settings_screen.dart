@@ -26,7 +26,7 @@ class SettingsScreen extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                  border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
                 ),
                 child: ListTile(
                   contentPadding: EdgeInsets.symmetric(
@@ -51,7 +51,7 @@ class SettingsScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.r),
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                 ),
                 child: CustomText(
                   text:
