@@ -15,4 +15,5 @@ A Flutter Project that focuses on advance topics. Covering the web to mobile tra
   The Product Screen tab is for you to see the List of Products
   that has been added and also the Settings page to light mode and darkmode
   
-
+- ##Lab3 - Cart Screen and API Integration##:
+  The Cart Screen is used to display the products added to a user's cart using the DummyJSON API. It uses a cart model and cart service to get the cart by user ID and add products to the cart.
