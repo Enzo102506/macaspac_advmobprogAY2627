@@ -20,3 +20,6 @@ A Flutter Project that focuses on advance topics. Covering the web to mobile tra
 - ##Lab4 - Authentication and State Management##:
  The Authentication and State Management Screen demonstrates how to implement persistent authentication using a user service and saved user data.
 
+- ##Lab5 - Used Firebase to improve authentication while keeping the existing app flow, with FirebaseAuth handling s
+ sign-in, sign-up,  sessions, and user data through UserService for a more secure and maintainable app.
+
