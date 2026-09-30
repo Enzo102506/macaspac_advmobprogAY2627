@@ -16,9 +16,6 @@ class _SignInScreenState extends State<SignInScreen> {
   final _passwordController = TextEditingController(text: 'emilyspass');
   bool _isLoading = false;
 
-  // LAB ACTIVITY 4 - ENHANCEMENT 2:
-  // The sign-in UI authenticates users through the UserService and stores the
-  // returned user session for later splash-screen reuse.
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -27,8 +24,8 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await UserService().login(
-        username: _usernameController.text,
+      await UserService().signIn(
+        emailOrUsername: _usernameController.text,
         password: _passwordController.text,
       );
 
@@ -116,7 +113,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         filled: true,
                         fillColor: Colors.white,
                         prefixIcon: Icon(Icons.person_outline, color: purple),
-                        hintText: 'Username',
+                        hintText: 'Email or Username',
                         hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 16.sp),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
@@ -134,7 +131,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your username.';
+                          return 'Please enter your email or username.';
                         }
                         return null;
                       },
@@ -201,6 +198,12 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                   SizedBox(height: 18.h),
+                  SizedBox(height: 12.h),
+                  TextButton(
+                    onPressed: () => Navigator.pushNamed(context, '/signup'),
+                    child: const Text('Create an account'),
+                  ),
+                  SizedBox(height: 10.h),
                   Container(
                     width: 330.w,
                     padding: EdgeInsets.all(12.w),

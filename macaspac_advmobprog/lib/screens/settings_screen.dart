@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../providers/theme_provider.dart';
+import '../services/user_service.dart';
 import '../widgets/custom_text.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -16,7 +17,6 @@ class SettingsScreen extends StatelessWidget {
           return ListView(
             padding: EdgeInsets.all(16.w),
             children: [
-              // Theme Section
               CustomText(
                 text: 'Appearance',
                 fontSize: 18.sp,
@@ -58,6 +58,43 @@ class SettingsScreen extends StatelessWidget {
                       'Current Theme: ${themeProvider.isDark ? 'Dark' : 'Light'}',
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: 20.h),
+              CustomText(
+                text: 'Account',
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
+              SizedBox(height: 12.h),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.logout, color: Colors.deepPurple),
+                  title: const Text('Logout'),
+                  onTap: () async {
+                    try {
+                      await UserService().logout();
+                      if (context.mounted) {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/signin',
+                          (route) => false,
+                        );
+                      }
+                    } catch (error) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(error.toString().replaceFirst('Exception: ', '')),
+                          ),
+                        );
+                      }
+                    }
+                  },
                 ),
               ),
             ],

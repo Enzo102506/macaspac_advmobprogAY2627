@@ -16,14 +16,198 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   Future<User?> _loadUser() async {
-    return UserService().getSavedUser();
+    return UserService().getUserData();
   }
 
-  // LAB ACTIVITY 4 - ENHANCEMENT 3:
-  // The profile screen loads the saved session and uses the authenticated user's
-  // id to load their cart information from the API.
   Future<Cart> _loadCartForUser(User user) async {
     return CartService().getCartByUserId(user.id);
+  }
+
+  Future<void> _updateUsername(User user) async {
+    final controller = TextEditingController(text: user.username);
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Update username'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(labelText: 'New username'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != true || !mounted) return;
+
+    try {
+      await UserService().updateUsername(controller.text);
+      if (!mounted) return;
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username updated successfully.')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
+  }
+
+  Future<void> _changePassword() async {
+    final currentController = TextEditingController();
+    final newController = TextEditingController();
+    final confirmedController = TextEditingController();
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Change password'),
+          content: SizedBox(
+            width: 320,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: currentController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Current password'),
+                ),
+                SizedBox(height: 10.h),
+                TextField(
+                  controller: newController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'New password'),
+                ),
+                SizedBox(height: 10.h),
+                TextField(
+                  controller: confirmedController,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Confirm new password'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != true || !mounted) return;
+
+    try {
+      final current = currentController.text.trim();
+      final newPass = newController.text.trim();
+      final confirm = confirmedController.text.trim();
+
+      if (newPass.isEmpty || newPass.length < 6) {
+        throw Exception('New password must be at least 6 characters.');
+      }
+
+      if (newPass != confirm) {
+        throw Exception('New passwords do not match.');
+      }
+
+      await UserService().resetPasswordFromCurrentPassword(
+        currentPassword: current,
+        newPassword: newPass,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password updated successfully.')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
+  }
+
+  Future<void> _deleteAccount(User user) async {
+    final controller = TextEditingController();
+    final navigator = Navigator.of(context);
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete account'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('This will permanently delete ${user.email}.', style: const TextStyle(fontSize: 15)),
+              SizedBox(height: 12.h),
+              TextField(
+                controller: controller,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Enter your password'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != true || !mounted) return;
+
+    try {
+      await UserService().deleteAccount(password: controller.text);
+      if (!mounted) return;
+      await UserService().logout();
+      navigator.pushNamedAndRemoveUntil('/signin', (route) => false);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
+  }
+
+  Future<void> _logout() async {
+    final navigator = Navigator.of(context);
+    try {
+      await UserService().logout();
+      if (!mounted) return;
+      navigator.pushNamedAndRemoveUntil('/signin', (route) => false);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
   }
 
   @override
@@ -154,15 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final navigator = Navigator.of(context);
-                              await UserService().logout();
-                              if (!mounted) return;
-                              navigator.pushNamedAndRemoveUntil(
-                                '/signin',
-                                (route) => false,
-                              );
-                            },
+                            onPressed: _logout,
                             icon: const Icon(Icons.logout),
                             label: const Text('Sign Out'),
                             style: ElevatedButton.styleFrom(
@@ -171,6 +347,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               padding: EdgeInsets.symmetric(vertical: 12.h),
                             ),
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 18.h),
+                  Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomText(
+                          text: 'Account Actions',
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        SizedBox(height: 12.h),
+                        _actionButton(
+                          label: 'Update Username',
+                          icon: Icons.edit,
+                          onPressed: () => _updateUsername(user),
+                        ),
+                        SizedBox(height: 8.h),
+                        _actionButton(
+                          label: 'Change Password',
+                          icon: Icons.lock_reset,
+                          onPressed: _changePassword,
+                        ),
+                        SizedBox(height: 8.h),
+                        _actionButton(
+                          label: 'Delete Account',
+                          icon: Icons.delete_forever,
+                          color: Colors.red,
+                          onPressed: () => _deleteAccount(user),
                         ),
                       ],
                     ),
@@ -290,6 +510,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _actionButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPressed,
+    Color color = Colors.deepPurple,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, color: color),
+        label: Text(label, style: TextStyle(color: color)),
+        style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: 12.h),
+          side: BorderSide(color: color.withValues(alpha: 0.4)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+        ),
       ),
     );
   }
