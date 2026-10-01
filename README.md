@@ -23,3 +23,8 @@ A Flutter Project that focuses on advance topics. Covering the web to mobile tra
 - ##Lab5 - Used Firebase to improve authentication while keeping the existing app flow, with FirebaseAuth handling s
  sign-in, sign-up,  sessions, and user data through UserService for a more secure and maintainable app.
 
+- ##Lab6 - Firebase Firestore Chat and User Management##:
+  This lab extends the project with Firestore integration for chat features.The chat list displays registered users excluding the current logged-in user, supports live updates, and includes search by name or email. The detail screen includes real-time message bubbles, send input, empty state, and message status indicators.
+
+
+
