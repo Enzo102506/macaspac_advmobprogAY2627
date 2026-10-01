@@ -15,11 +15,19 @@ class ProductScreen extends StatefulWidget {
 
 class _ProductScreenState extends State<ProductScreen> {
   late final Future<List<Product>> _productsFuture;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     _productsFuture = ProductService().getAllProducts();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -30,17 +38,37 @@ class _ProductScreenState extends State<ProductScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: ScreenUtil().screenWidth,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(),
-              ),
-              child: CustomText(
-                text: 'Search',
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
+            TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.trim();
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 14.h,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide(
+                    color: const Color(0xFF6B4BB2),
+                    width: 1.5,
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 16.h),
@@ -64,7 +92,17 @@ class _ProductScreenState extends State<ProductScreen> {
                   );
                 }
 
-                final products = snapshot.data ?? [];
+                final allProducts = snapshot.data ?? [];
+                final products = _searchQuery.isEmpty
+                    ? allProducts
+                    : allProducts.where((product) {
+                        final title = product.title.toLowerCase();
+                        final category = product.category.toLowerCase();
+                        final query = _searchQuery.toLowerCase();
+                        return title.contains(query) ||
+                            category.contains(query);
+                      }).toList();
+
                 if (products.isEmpty) {
                   return Center(
                     child: CustomText(
@@ -128,7 +166,8 @@ class _ProductScreenState extends State<ProductScreen> {
                                   ),
                                   SizedBox(height: 4.h),
                                   CustomText(
-                                    text: '\$${product.price.toStringAsFixed(2)}',
+                                    text:
+                                        '\$${product.price.toStringAsFixed(2)}',
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w600,
                                   ),

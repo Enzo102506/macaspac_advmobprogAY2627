@@ -6,12 +6,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants.dart';
 import '../models/user.dart';
+import 'chat_service.dart';
 
 class UserService {
   static const String _userKey = 'saved_user';
   final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
 
-  Future<User> login({required String username, required String password}) async {
+  Future<User> login({
+    required String username,
+    required String password,
+  }) async {
     final response = await http.post(
       Uri.parse('$host/auth/login'),
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
@@ -49,6 +53,10 @@ class UserService {
 
     if (value.isEmpty) {
       throw Exception('Please enter your email or username.');
+    }
+
+    if (!value.contains('@')) {
+      return login(username: value, password: password);
     }
 
     try {
@@ -101,7 +109,15 @@ class UserService {
         contactNo: contactNo.trim(),
       );
 
-      await saveUser(user);
+      await ChatService().syncCurrentUserProfile(
+        uid: firebaseUser.uid,
+        name: username.trim(),
+        email: firebaseUser.email ?? emailAddress.trim(),
+        photoUrl: firebaseUser.photoURL ?? '',
+      );
+
+      await _auth.signOut();
+      await clearSession();
       return user;
     } on firebase_auth.FirebaseAuthException catch (error) {
       throw Exception(_messageFromFirebaseError(error));
@@ -144,6 +160,12 @@ class UserService {
     );
 
     await saveUser(profile);
+    await ChatService().syncCurrentUserProfile(
+      uid: currentUser.uid,
+      name: profile.username,
+      email: profile.email,
+      photoUrl: profile.image,
+    );
     return profile;
   }
 
@@ -264,6 +286,12 @@ class UserService {
     );
 
     await saveUser(user);
+    await ChatService().syncCurrentUserProfile(
+      uid: firebaseUser.uid,
+      name: user.username,
+      email: user.email,
+      photoUrl: user.image,
+    );
     return user;
   }
 

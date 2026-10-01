@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../services/user_service.dart';
@@ -41,7 +42,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
 
       if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account created. Please sign in.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pushNamedAndRemoveUntil(context, '/signin', (route) => false);
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -107,7 +114,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           label: 'First Name',
                           icon: Icons.person_outline,
                           validator: (value) =>
-                              value == null || value.trim().isEmpty ? 'Required' : null,
+                              value == null || value.trim().isEmpty
+                              ? 'Required'
+                              : null,
                         ),
                       ),
                       SizedBox(width: 12.w),
@@ -117,7 +126,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           label: 'Last Name',
                           icon: Icons.person_outline,
                           validator: (value) =>
-                              value == null || value.trim().isEmpty ? 'Required' : null,
+                              value == null || value.trim().isEmpty
+                              ? 'Required'
+                              : null,
                         ),
                       ),
                     ],
@@ -150,12 +161,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           label: 'Contact Number',
                           icon: Icons.phone_outlined,
                           keyboardType: TextInputType.phone,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Required';
                             }
-                            if (value.trim().length < 7) {
-                              return 'Invalid';
+                            final phone = value.trim();
+                            if (phone.length < 7 || phone.length > 15) {
+                              return 'Enter a valid phone number';
+                            }
+                            final digitsOnly = RegExp(r'^[0-9]+$');
+                            if (!digitsOnly.hasMatch(phone)) {
+                              return 'Phone number must contain only digits';
                             }
                             return null;
                           },
@@ -188,9 +207,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter your email.';
                       }
-                      final emailRegex = RegExp(
-                        r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-                      );
+                      final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
                       if (!emailRegex.hasMatch(value.trim())) {
                         return 'Enter a valid email address.';
                       }
@@ -242,7 +259,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           : const Icon(Icons.person_add_alt_1_rounded),
                       label: Text(
                         _isLoading ? 'Creating account...' : 'Create Account',
-                        style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -266,12 +286,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required IconData icon,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
+    List<TextInputFormatter> inputFormatters = const [],
     required String? Function(String?) validator,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       style: TextStyle(fontSize: 15.sp),
       decoration: InputDecoration(
         filled: true,

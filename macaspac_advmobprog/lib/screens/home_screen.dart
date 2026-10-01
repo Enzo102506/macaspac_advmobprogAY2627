@@ -4,10 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants.dart';
 import '../models/user.dart';
 import '../services/user_service.dart';
+import '../widgets/custom_text.dart';
 import 'cart_screen.dart';
+import 'chat_screen.dart';
 import 'product_screen.dart';
 import 'profile_screen.dart';
-import '../widgets/custom_text.dart';
 
 class HomeScreen extends StatefulWidget {
   final String username;
@@ -71,10 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
           controller: _pageController,
           children: <Widget>[
             const ProductScreen(),
-            CartScreen(
-              key: _cartScreenKey,
-              userId: activeUserId,
-            ),
+            CartScreen(key: _cartScreenKey, userId: activeUserId),
             const ProfileScreen(),
           ],
           onPageChanged: (page) {
@@ -82,6 +80,17 @@ class _HomeScreenState extends State<HomeScreen> {
               _selectedIndex = page;
             });
           },
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ChatScreen()),
+            );
+          },
+          icon: const Icon(Icons.chat_bubble_outline_rounded),
+          label: const Text('Chat'),
+          backgroundColor: const Color(0xFF6B4BB2),
         ),
         bottomNavigationBar: BottomNavigationBar(
           showSelectedLabels: false,

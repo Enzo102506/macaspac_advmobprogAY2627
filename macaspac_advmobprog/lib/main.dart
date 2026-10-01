@@ -11,6 +11,7 @@ import 'firebase_options.dart';
 
 // screens
 import 'screens/cart_screen.dart';
+import 'screens/chat_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/sign_in_screen.dart';
@@ -60,6 +61,7 @@ class MacaspacAdvMobProg extends StatelessWidget {
               '/signin': (context) => const SignInScreen(),
               '/signup': (context) => const SignUpScreen(),
               '/home': (context) => const HomeScreen(),
+              '/chat': (context) => const ChatScreen(),
               '/settings': (context) => const SettingsScreen(),
               '/cart': (context) => CartScreen(userId: cartUserId),
             },

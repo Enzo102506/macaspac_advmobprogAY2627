@@ -12,8 +12,8 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController(text: 'emilys');
-  final _passwordController = TextEditingController(text: 'emilyspass');
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _isLoading = false;
 
   Future<void> _signIn() async {
@@ -114,7 +114,10 @@ class _SignInScreenState extends State<SignInScreen> {
                         fillColor: Colors.white,
                         prefixIcon: Icon(Icons.person_outline, color: purple),
                         hintText: 'Email or Username',
-                        hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 16.sp),
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 16.sp,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
                           borderSide: BorderSide.none,
@@ -125,7 +128,10 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
-                          borderSide: const BorderSide(color: purple, width: 1.5),
+                          borderSide: const BorderSide(
+                            color: purple,
+                            width: 1.5,
+                          ),
                         ),
                         contentPadding: EdgeInsets.symmetric(vertical: 18.h),
                       ),
@@ -149,7 +155,10 @@ class _SignInScreenState extends State<SignInScreen> {
                         fillColor: Colors.white,
                         prefixIcon: Icon(Icons.lock_outline, color: purple),
                         hintText: 'Password',
-                        hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 16.sp),
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 16.sp,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
                           borderSide: BorderSide.none,
@@ -160,7 +169,10 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
-                          borderSide: const BorderSide(color: purple, width: 1.5),
+                          borderSide: const BorderSide(
+                            color: purple,
+                            width: 1.5,
+                          ),
                         ),
                         contentPadding: EdgeInsets.symmetric(vertical: 18.h),
                       ),
@@ -188,12 +200,18 @@ class _SignInScreenState extends State<SignInScreen> {
                           ? SizedBox(
                               width: 16.w,
                               height: 16.h,
-                              child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             )
                           : const Icon(Icons.login_rounded),
                       label: Text(
                         _isLoading ? 'Signing in...' : 'Sign In',
-                        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -202,24 +220,6 @@ class _SignInScreenState extends State<SignInScreen> {
                   TextButton(
                     onPressed: () => Navigator.pushNamed(context, '/signup'),
                     child: const Text('Create an account'),
-                  ),
-                  SizedBox(height: 10.h),
-                  Container(
-                    width: 330.w,
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Text(
-                      'Demo account: emilys / emilyspass',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: purple,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                   ),
                 ],
               ),
